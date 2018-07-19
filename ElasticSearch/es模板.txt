@@ -1,0 +1,157 @@
+elasticsearch之索引模板Template 
+
+template大致分成setting和mappings两部分：
+索引可使用预定义的模板进行创建,这个模板称作Index templates。模板设置包括settings和mappings，通过模式匹配的方式使得多个索引重用一个模板。 
+1. settings主要作用于index的一些相关配置信息，如分片数、副本数，tranlog同步条件、refresh等。
+2. mappings主要是一些说明信息，大致又分为_all、_source、prpperties这三部分： 
+ (1) _all：主要指的是AllField字段，我们可以将一个或多个都包含进来，在进行检索时无需指定字段的情况下检索多个字段。设置“_all" : {"enabled" : true}
+ (2) _source：主要指的是SourceField字段，Source可以理解为ES除了将数据保存在索引文件中，另外还有一份源数据。_source字段在我们进行检索时相当重要，如果在{"enabled" : false}情况下默认检索只会返回ID， 你需要通过Fields字段去到索引中去取数据，效率不是很高。但是enabled设置为true时，索引会比较大，这时可以通过Compress进行压缩和inclueds、excludes来在字段级别上进行一些限制，自定义哪些字段允许存储。
+ (3) properties：这是最重要的步骤，主要针对索引结构和字段级别上的一些设置。
+
+ 通过模板创建elasticsearch索引语句（灰常重要）：
+ curl -XPOST 192.168.80.10:9200/test -d '
+ 模板
+ '
+ 
+ 创建模板的语句：
+ curl -XPUT 192.168.80.10:9200/_template/template_1 -d '
+ 模板
+ '
+ 
+ 
+一、创建模板
+{
+  "template": "pmall*",
+  "settings": {
+    "index.number_of_shards": 1,
+    "number_of_replicas": 4,
+    "similarity": {
+      "IgnoreTFSimilarity": {
+        "type": "IgoreTFSimilarity"
+      }
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "_source": {
+        "enabled": false
+      }
+    },
+    "commodity": {
+      "properties": {
+        "sold": {
+          "type": "long"
+        },
+        "online_time": {
+          "type": "long"
+        },
+        "price": {
+          "type": "long"
+        },
+        "publish_time": {
+          "type": "long"
+        },
+        "id": {
+          "type": "long"
+        },
+        "catecode": {
+          "type": "integer"
+        },
+        "title": {
+          "search_analyzer": "ikSmart",
+          "similarity": "IgnoreTFSimilarity",
+          "analyzer": "ik",
+          "type": "text"
+        },
+        "content": {
+          "index": false,
+          "store": true,
+          "type": "keyword"
+        },
+        "status": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
+
+二、删除模板：
+
+DELETE /_template/template_1
+
+三、查看模板：
+ 
+GET /_template/template_1
+
+也可以通过模糊匹配得到多个模板信息
+
+GET /_template/temp* 
+
+可以批量查看模板
+
+GET /_template/template_1,template_2
+
+验证模板是否存在：
+ 
+HEAD _template/template_1
+
+四、多个模板同时匹配，以order顺序倒排，order越大，优先级越高
+ 
+
+PUT /_template/template_1
+{
+    "template" : "*",
+    "order" : 0,
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "mappings" : {
+        "type1" : {
+            "_source" : { "enabled" : false }
+        }
+    }
+}
+
+PUT /_template/template_2
+{
+    "template" : "te*",
+    "order" : 1,
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "mappings" : {
+        "type1" : {
+            "_source" : { "enabled" : true }
+        }
+    }
+}
+
+
+五、模板版本号：
+ 
+模板可以选择添加版本号，这可以是任何整数值，以便简化外部系统的模板管理。版本字段是完全可选的，它仅用于模板的外部管理。要取消设置版本，只需替换模板即可
+
+创建模板：
+
+PUT /_template/template_1
+{
+    "template" : "*",
+    "order" : 0,
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "version": 123
+}
+
+查看模板版本号：
+
+GET /_template/template_1?filter_path=*.version
+
+响应如下：
+
+{
+  "template_1" : {
+    "version" : 123
+  }
+}
