@@ -1,0 +1,34 @@
+红帽系列中，进行软件安装可以有三种方法，编译安装，rpm包安装，和yum源安装。其中yum方法安装最简单，因为它可以自动解决软件包之间的依赖关系。
+yum源位置：
+	/etc/yum.repos.d
+目录：
+	CentOS-Base.repo  CentOS-Debuginfo.repo  CentOS-Media.repo    
+	CentOS-Vault.repo  epel-testing.repo     nodesource-el7.repo
+	CentOS-CR.repo    CentOS-fasttrack.repo  CentOS-Sources.repo  
+	epel.repo          mongodb-org-3.2.repo
+默认的yum源是CentOS-Base.repo,可以在此文件中修改，也可以将他修改后缀名，这里就修改后缀名吧
+	mv /etc/yum.conf.d/CentOS-Base.repo /etc/yum.conf.d/CentOS-Base.repo.bak
+内容：
+	[CentOS7-base]   #源名称，必填
+	name=CentOS-$releasever-base  #源描述，可以不填，但是会有提示
+	baseurl=file:///misc/cd/      #本地的光盘文件，可以有多个地址。必填
+			https://mirrors.aliyun.com/centos/7.3.1611/os/x86_64/
+	gpgcheck=1                    #是否开启校验，在yum.conf中已经定义它默认值为1
+	enabled=1                     #是否禁用此yum源,默认为
+	gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+	#如果开启yum源包校验，则需要导入RPM公钥，此处只是在系统没有导入rpm公钥时候进行安装
+	#这里相当于rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 
+	[aliyun_epel]   #这是Redhat的扩展包
+	name=ailiyun_yum_epel
+	baseurl=https://mirrors.aliyun.com/epel/$releasever/x86_64
+	gpgkey=https://mirrors.aliyun.com/epel/RPM-GPG-KEY-EPEL-7
+	gpgcheck=1
+	
+附加MongoDB源配置：
+	[mongodb-org-3.2]
+	name=MongoDB Repository
+	baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.2/x86_64/
+	gpgcheck=1
+	enabled=1
+	gpgkey=https://www.mongodb.org/static/pgp/server-3.2.asc
+		
