@@ -1,0 +1,32 @@
+CentOS7安装Java环境
+一、gz安装
+1.下载JDK，下载地址为：http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+2.下载后将.gz文件移动至/usr/local/java文件夹，Java文件夹需要自己创建，命令为：
+mv jdk-8u151-linux-x64.tar.gz /usr/local/java
+3.解压
+tar -zxvf jdk-8u151-linux-x64.tar.gz
+4.将java路径添加到环境变量
+vi /etc/profile
+export JAVA_HOME=/usr/local/java/jdk1.8.0_151/
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
+export PATH=$PATH:${JAVA_HOME}/bin:$PATH
+5.使文件生效
+source  /etc/profile
+6.验证
+java -version
+7.卸载java
+rpm -qa|grep jdk
+yum -y remove jdk1.8-1.8.0
+java -version
+二、rpm安装
+ 1.首先检测系统是否安装了JDK
+java -version
+如果centos安装完毕后，就发现已经安装了jdk，那么极有可能是安装了OpenJDK，可以通过以下命令进一步查看JDK信息：
+rpm -qa | grep openjdk
+卸载OpenJDK，执行以下操作：
+rpm -e --nodeps java-1.6.0-openjdk-xxx
+安装JAVA JDK，此处应该下载jdk的rpm版本
+rpm -ivh jdk-7-linux-x64.rpm
+配置环境变量如上。
+echo $PATH
