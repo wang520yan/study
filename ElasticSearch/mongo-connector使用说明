@@ -1,0 +1,18 @@
+mongo-connector配置说明
+1 首先创建文件夹 /etc/mongo-connector
+2 将配置文件模板config_example.json放入该文件夹中，配置信息根据实际情况做必要修改。
+3 安装mongo-connector： pip install mongo-connector
+4 安装elastic_doc_manager: pip install elastic-doc-manager
+                          pip install elastic2-doc-manager
+
+5 启动mongo-connector
+  mongo-connector -c /etc/mongo-connector/congfig_example.json
+
+6 es1.x 	pip install 'mongo-connector[elastic]'
+  es2.x 	pip install 'mongo-connector[elastic2]'
+  es5.x 	pip install 'mongo-connector[elastic5]'
+注意：
+一般的elasticsearch采用2.*版本。
+Python对应的安装包为：
+elasticsearch(2.3.0)
+elasticsearch-dsl(2.2.0)
