@@ -38,8 +38,8 @@
     "__fields": ["field1", "field2", "field3"],
 
     "namespaces": {
-        "panyuehao.test": {
-            "rename": "panyuehao.test"
+        "wangyan.test": {
+            "rename": "wangyan.test"
         }
     },
 
